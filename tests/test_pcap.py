@@ -1,7 +1,6 @@
 """Container-level tests: does the pcap reader survive real-world shapes?"""
 
 import atexit
-import os
 import shutil
 import struct
 import sys
