@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netioc"
+version = "0.1.0"
+description = "Zero-dependency IOC extraction from packet captures: DNS names, HTTP hosts/URIs, TLS SNI, external addresses."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "RicardoMLu777" }]
+keywords = ["pcap", "ioc", "dfir", "network-forensics", "blue-team", "incident-response"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Security",
+    "Topic :: System :: Networking :: Monitoring",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3,<9"]
+
+[project.scripts]
+netioc = "netioc.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/RicardoMLu777/netioc"
+
+[tool.setuptools]
+packages = ["netioc"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

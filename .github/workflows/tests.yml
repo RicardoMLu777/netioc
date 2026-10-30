@@ -1,0 +1,73 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run tests
+        run: pytest -q
+
+      - name: CLI smoke test
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, "tests")
+          from helpers import dns_query, eth, http_request, ip4, pcap, tcp, tls_client_hello, udp
+
+          frames = [
+              eth(ip4("10.0.0.5", "8.8.8.8", 17, udp(53001, 53, dns_query("c2.example")))),
+              eth(ip4("10.0.0.5", "93.184.216.34", 6, tcp(49152, 80, http_request("c2.example", "/gate.php")))),
+              eth(ip4("10.0.0.5", "93.184.216.34", 6, tcp(49160, 443, tls_client_hello("beacon.example")))),
+          ]
+          open("/tmp/smoke.pcap", "wb").write(pcap(frames))
+          PY
+          netioc /tmp/smoke.pcap --json > /tmp/smoke.json
+          python - <<'PY'
+          import json
+          data = json.load(open("/tmp/smoke.json"))
+          names = [h["value"] for h in data["dns_queries"]]
+          assert "c2.example" in names, names
+          hosts = [h["value"] for h in data["http_hosts"]]
+          assert "c2.example" in hosts, hosts
+          sni = [h["value"] for h in data["tls_sni"]]
+          assert "beacon.example" in sni, sni
+          print("smoke ok:", data["stats"])
+          PY
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install ruff
+      - name: Ruff check
+        run: ruff check . --select E,F,W --ignore E501
+      - name: Byte-compile
+        run: python -m compileall -q netioc
