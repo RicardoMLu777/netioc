@@ -4,6 +4,14 @@
 
 Pull indicators of compromise out of a packet capture — DNS names, HTTP hosts and URIs, TLS SNI, external addresses — with nothing but the standard library.
 
+[![tests](https://github.com/RicardoMLu777/netioc/actions/workflows/tests.yml/badge.svg)](https://github.com/RicardoMLu777/netioc/actions/workflows/tests.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![runtime deps](https://img.shields.io/badge/runtime%20deps-0-brightgreen.svg)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![source](https://img.shields.io/badge/source-986%20lines%20of%20stdlib-informational.svg)](netioc/)
+
+![netioc pipeline](docs/pipeline.svg)
+
 ---
 
 ## 为什么会有这个工具
